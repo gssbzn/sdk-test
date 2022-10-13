@@ -14,7 +14,7 @@ func main() {
 	apiKey := os.Getenv("MDB_API_KEY")
 	apiSecret := os.Getenv("MDB_API_SECRET")
 	baseURL := os.Getenv("MDB_BASE_URL")
-	os.Getenv("MDB_API_KEY")
+
 	t := digest.NewTransport(apiKey, apiSecret)
 	tc, err := t.Client()
 	if err != nil {
