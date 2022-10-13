@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/mongodb-forks/digest"
-	"go.mongodb.org/atlas/mongodbatlas"
+	mongodbatlas "go.mongodb.org/atlas"
 )
 
 func main() {
@@ -20,12 +20,25 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-
-	client, err := mongodbatlas.New(tc, mongodbatlas.SetBaseURL(baseURL))
+	cfg := &mongodbatlas.Configuration{
+		HTTPClient: tc,
+		Servers: mongodbatlas.ServerConfigurations{
+			{
+				URL: baseURL,
+			},
+		},
+	}
+	client := mongodbatlas.NewAPIClient(cfg)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
-	projects, _, err := client.Projects.GetAllProjects(context.Background(), nil)
-	fmt.Printf("%#v\n", projects)
+	resp, r, err := client.ProjectsApi.ReturnAllProjects(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `ProjectsApi.ReturnAllProjects``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ReturnAllProjects`: PaginatedAtlasGroupView
+	fmt.Fprintf(os.Stdout, "Response from `ProjectsApi.ReturnAllProjects`: %v\n", resp)
+	fmt.Printf("%#v\n", resp)
 }
